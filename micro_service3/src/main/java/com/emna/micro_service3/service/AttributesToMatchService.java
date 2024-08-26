@@ -1,6 +1,7 @@
 package com.emna.micro_service3.service;
 
 import com.emna.micro_service3.Repository.AttributesToMatchRepository;
+import com.emna.micro_service3.dto.FormulaDTO;
 import com.emna.micro_service3.model.AttributesToMatch;
 import com.emna.micro_service3.model.IndexConfigurationAttributeToAdd;
 import com.emna.micro_service3.model.enums.Operation;
@@ -8,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -90,10 +88,18 @@ public class AttributesToMatchService {
         return repository.findByMatchingConfigurationId(matchingConfigurationId);
     }
 
-    public List<String> getFormulesByMatchingConfigurationId(String matchingConfigurationId) {
-        List<AttributesToMatch> attributesToMatchList = getByMatchingConfigurationId(matchingConfigurationId);
-        return attributesToMatchList.stream()
+    public List<FormulaDTO> getFormulasByMatchingConfigurationId(String reconciliationConfigurationId) {
+        List<AttributesToMatch> attributesList = repository.findByMatchingConfigurationId(reconciliationConfigurationId);
+        if (attributesList == null) {
+            return Collections.emptyList();
+        }
+        return attributesList.stream()
                 .map(AttributesToMatch::getFormule)
                 .collect(Collectors.toList());
     }
+
+    public void deleteFormulaById(String id) {
+        repository.deleteById(id);
+    }
+
 }

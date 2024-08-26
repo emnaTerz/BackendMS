@@ -1,1 +1,0 @@
-{"element":{"name":"library","complexType":{"sequence":{"element":{"name":"book","maxOccurs":"unbounded","minOccurs":"0","complexType":{"sequence":{"element":[{"name":"title","type":"xs:string"},{"name":"author","type":"xs:string"},{"name":"isbn","type":"xs:string"},{"name":"publishedDate","type":"xs:date"},{"name":"price","type":"xs:decimal"}]}}}}}}}

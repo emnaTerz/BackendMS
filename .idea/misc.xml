@@ -11,6 +11,9 @@
         <option value="$PROJECT_DIR$/micro_service1/pom.xml" />
         <option value="$PROJECT_DIR$/micro_service2/pom.xml" />
         <option value="$PROJECT_DIR$/micro_service3/pom.xml" />
+        <option value="$PROJECT_DIR$/micro-service4/pom.xml" />
+        <option value="$PROJECT_DIR$/micro_service4/pom.xml" />
+        <option value="$PROJECT_DIR$/micro_service5/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

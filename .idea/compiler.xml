@@ -9,12 +9,15 @@
         <module name="micro_service3" />
         <module name="config-server" />
         <module name="micro_service2" />
-        <module name="gateway" />
+        <module name="micro_service5" />
+        <module name="micro_service4" />
         <module name="discovery" />
+        <module name="gateway" />
         <module name="micro_service1" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="micro-service4" target="17" />
       <module name="microservice1" target="17" />
     </bytecodeTargetLevel>
   </component>
@@ -23,9 +26,12 @@
       <module name="config-server" options="-parameters" />
       <module name="discovery" options="-parameters" />
       <module name="gateway" options="-parameters" />
+      <module name="micro-service4" options="-parameters" />
       <module name="micro_service1" options="-parameters" />
       <module name="micro_service2" options="-parameters" />
       <module name="micro_service3" options="-parameters" />
+      <module name="micro_service4" options="-parameters" />
+      <module name="micro_service5" options="-parameters" />
       <module name="microservice1" options="-parameters" />
     </option>
   </component>

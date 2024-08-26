@@ -7,11 +7,10 @@ import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import org.springframework.stereotype.Component;
 
 @Component
-@EnableElasticsearchRepositories(basePackages = "com.emna.micro_service2.repository")
+/*@EnableElasticsearchRepositories(basePackages = "com.emna.micro_service3.repository")*/
 public class ESClient {
 
     @Bean

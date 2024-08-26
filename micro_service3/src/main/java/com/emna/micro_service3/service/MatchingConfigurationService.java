@@ -118,11 +118,11 @@ public class MatchingConfigurationService {
 
     @Transactional
     public MatchingConfiguration createMatchingConfiguration(String sourceId, String targetId, String name, MatchingType matchingType, List<Date> scheduleList) {
-        // Check if a matching configuration already exists
-        List<MatchingConfiguration> existingConfigs = repository.findBySourceIdAndTargetId(sourceId, targetId);
+        // Check if a matching configuration already exists with the same sourceId, targetId, and matchingType
+        List<MatchingConfiguration> existingConfigs = repository.findBySourceIdAndTargetIdAndMatchingType(sourceId, targetId, matchingType);
 
         if (!existingConfigs.isEmpty()) {
-            throw new IllegalArgumentException("A matching configuration with the same sourceId and targetId already exists.");
+            throw new IllegalArgumentException("A matching configuration with the same sourceId, targetId, and matchingType already exists.");
         }
 
         MatchingConfiguration matchingConfiguration = new MatchingConfiguration(

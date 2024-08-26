@@ -1,6 +1,8 @@
 package com.emna.micro_service3.controller;
 
+import com.emna.micro_service3.Repository.AttributesToMatchRepository;
 import com.emna.micro_service3.dto.AttributesToMatchRequest;
+import com.emna.micro_service3.dto.FormulaDTO;
 import com.emna.micro_service3.model.AttributesToMatch;
 import com.emna.micro_service3.service.AttributesToMatchService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 public class AttributesToMatchController {
+    @Autowired
+    private AttributesToMatchRepository repository;
     @Autowired
     private AttributesToMatchService service;
     @PostMapping("/create")
@@ -48,9 +52,23 @@ public class AttributesToMatchController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting attribute: " + e.getMessage());
         }
     }
-    @GetMapping("/{matchingConfigurationId}/formules")
-    public List<String> getFormulesByMatchingConfigurationId(@PathVariable String matchingConfigurationId) {
-        return service.getFormulesByMatchingConfigurationId(matchingConfigurationId);
+    @GetMapping("/formulas/{reconciliationConfigurationId}")
+    public ResponseEntity<List<FormulaDTO>> getFormulasByMatchingConfigurationId(@PathVariable String reconciliationConfigurationId) {
+        List<FormulaDTO> formulas = service.getFormulasByMatchingConfigurationId(reconciliationConfigurationId);
+        if (formulas.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(formulas);
+    }
+
+    @DeleteMapping("/formulas/{id}")
+    public ResponseEntity<Void> deleteFormulaById(@PathVariable String id) {
+        if (repository.existsById(id)) {
+            service.deleteFormulaById(id);
+            return ResponseEntity.noContent().build(); // Return 204 No Content
+        } else {
+            return ResponseEntity.notFound().build(); // Return 404 Not Found if the ID does not exist
+        }
     }
 
 
