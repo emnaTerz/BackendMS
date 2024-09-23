@@ -107,4 +107,8 @@ public class ReconciliationResultController {
         List<ReconciliationResult> results = reconciliationConfigurationService.getReconciliationResultsByTargetMessageId(targetMessageId);
         return ResponseEntity.ok(results);
     }
+    @GetMapping("/message-id/{messageId}")
+    public List<ReconciliationResult> getReconciliationResultsByMessageId(@PathVariable("messageId") String messageId) {
+        return reconciliationConfigurationService.getReconciliationResultsByMessageId(messageId);
+    }
 }

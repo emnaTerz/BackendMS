@@ -10,5 +10,5 @@ import java.util.List;
 public interface AttributesToReconciliationRepository extends ElasticsearchRepository<AttributesToReconciliation, String> {
     List<AttributesToReconciliation> findByReconciliationConfigurationId(String reconciliationConfigurationId);
 
-    void deleteAllByReconciliationConfigurationId(String reconciliationConfigurationId);
+
 }

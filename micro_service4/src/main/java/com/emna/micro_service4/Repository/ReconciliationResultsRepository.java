@@ -19,7 +19,5 @@ public interface ReconciliationResultsRepository extends ElasticsearchRepository
     @Query("{\"bool\": {\"must\": [{\"match\": {\"sourceMessages.sourceMessageId\": \"?0\"}}]}}")
     List<ReconciliationResult> findBySourceMessagesSourceMessageId(String sourceMessageId);
 
-    @Query("{\"bool\": {\"must\": [{\"match\": {\"targetMessages.targetMessageId\": \"?0\"}}]}}")
-    List<ReconciliationResult> findByTargetMessagesTargetMessageId(String targetMessageId);
 
 }

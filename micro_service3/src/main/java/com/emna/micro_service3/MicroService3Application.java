@@ -4,10 +4,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableFeignClients
 @SpringBootApplication (exclude = {DataSourceAutoConfiguration.class })
-/*@EnableElasticsearchRepositories(basePackages = "com.emna.micro_service3.Repository")*/
+@EnableScheduling
 
 public class MicroService3Application  {
 

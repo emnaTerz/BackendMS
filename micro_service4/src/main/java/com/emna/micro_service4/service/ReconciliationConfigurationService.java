@@ -104,11 +104,9 @@ import com.emna.micro_service4.model.ReconciliationConfiguration;
 import com.emna.micro_service4.model.ReconciliationResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -120,6 +118,8 @@ public class ReconciliationConfigurationService {
     private ReconciliationConfigurationRepository repository;
 
     public ReconciliationConfiguration createReconciliationConfiguration(ReconciliationConfigurationDTO dto) {
+        dto.setCreationDate(new Date());
+
         // Check if a configuration with the same matchingConfigurationId already exists
         Optional<ReconciliationConfiguration> existingConfig = repository.findByMatchingConfigurationId(dto.getMatchingConfigurationId());
         if (existingConfig.isPresent()) {
@@ -287,6 +287,26 @@ public class ReconciliationConfigurationService {
         return false; // Group not reconciled
     }
 
+    public List<ReconciliationResult> getReconciliationResultsByMessageId(String messageId) {
+        return reconciliationResultsRepository.findAll().stream()
+                .filter(result ->
+                        result.getSourceMessages().containsKey(messageId) ||
+                                result.getTargetMessages().containsKey(messageId))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void updateLastReconciliationDate(String id, Date date) {
+        Optional<ReconciliationConfiguration> optionalConfig = repository.findById(id);
+        if (optionalConfig.isPresent()) {
+            ReconciliationConfiguration config = optionalConfig.get();
+            config.setLastReconciliationDate(date);
+            repository.save(config);
+            System.out.println("Updated last reconciliation date for config ID: " + id + " to " + date);
+        } else {
+            System.err.println("Configuration not found for ID: " + id);
+        }
+    }
 
 }
 

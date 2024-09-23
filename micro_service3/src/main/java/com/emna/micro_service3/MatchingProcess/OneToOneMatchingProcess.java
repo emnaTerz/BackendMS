@@ -1,3 +1,5 @@
+
+
 package com.emna.micro_service3.MatchingProcess;
 
 
@@ -40,7 +42,7 @@ public class OneToOneMatchingProcess implements MatchingProcess {
     @Autowired
     private MatchingService matchingService;
 
-/*
+
   @Override
   public void process(MatchingConfiguration matchingConfiguration) throws ScriptException, IOException {
       List<PendingMessage> sourceMessages = getMessagesByConfigId(matchingConfiguration.getSourceId());
@@ -63,7 +65,7 @@ public class OneToOneMatchingProcess implements MatchingProcess {
               String pairId = sourceMessage.getId() + "-" + targetMessage.getId();
 
               // Check if the matching result already exists for this pair
-              if (matchingService.existsMatchingResult(matchingConfiguration.getId(), sourceMessage.getId(), targetMessage.getId())) {
+              if (matchingService.doesSourceWithTargetExist(matchingConfiguration.getId(), sourceMessage.getId(), targetMessage.getId())) {
                   System.out.println("Pair already processed: " + pairId);
                   processedSourceTargetPairs.add(pairId); // Mark this source-target pair as processed
                   continue; // Skip the pair as it is already processed
@@ -77,15 +79,15 @@ public class OneToOneMatchingProcess implements MatchingProcess {
 
               MatchingResult matchingResult = new MatchingResult();
               matchingResult.setMatchingConfigurationId(matchingConfiguration.getId());
-              matchingResult.setSourceMessages(Map.of("sourceMessageId", sourceMessage.getId()));
-              matchingResult.setTargetMessages(Map.of("targetMessageId", targetMessage.getId()));
+              matchingResult.setSourceMessages(Map.of(sourceMessage.getId(),"sourceMessageId" + sourceMessage.getId()));
+              matchingResult.setTargetMessages(Map.of(targetMessage.getId(), "Target Message " + targetMessage.getId()));
               matchingResult.setTimestamp(new Date());
 
               if (match) {
                   matchingResult.setMatchStatus("Matched");
                   matchingResult.setMatchDetails("Source message ID: " + sourceMessage.getId() + ", Target message ID: " + targetMessage.getId() + " did match.");
                   matchingResult.setMatchedAttributes(new HashMap<>(matchedAttributes));
-                  matchingResult.setUnmatchedAttributes(new HashMap<>());
+                  /*matchingResult.setUnmatchedAttributes(new HashMap<>());*/
                   sourceMessageMatchStatus.put(sourceMessage.getId(), true);
                   targetMessageMatchStatus.put(targetMessage.getId(), true);
               } else {
@@ -110,65 +112,7 @@ public class OneToOneMatchingProcess implements MatchingProcess {
 
       // Update the status of each source and target message
 
-  }*/
-
-    @Override
-    public void process(MatchingConfiguration matchingConfiguration) throws ScriptException, IOException {
-        List<PendingMessage> sourceMessages = getMessagesByConfigId(matchingConfiguration.getSourceId());
-        List<PendingMessage> targetMessages = getMessagesByConfigId(matchingConfiguration.getTargetId());
-
-        Map<String, Boolean> sourceMessageMatchStatus = new HashMap<>();
-        Map<String, Boolean> targetMessageMatchStatus = new HashMap<>();
-
-        for (PendingMessage sourceMessage : sourceMessages) {
-            sourceMessageMatchStatus.put(sourceMessage.getId(), false);
-
-            for (PendingMessage targetMessage : targetMessages) {
-                targetMessageMatchStatus.put(targetMessage.getId(), false);
-
-                // Check if this source-target pair has already been processed
-                if (matchingService.doesSourceWithTargetExist(matchingConfiguration.getId(), sourceMessage.getId(), targetMessage.getId())) {
-                    System.out.println("Source ID " + sourceMessage.getId() + " has already been processed with target ID " + targetMessage.getId());
-                    continue; // Skip as this combination of source and target IDs is already processed
-                }
-
-                Map<String, String> matchedAttributes = new HashMap<>();
-                Map<String, String> unmatchedAttributes = new HashMap<>();
-
-                boolean match = isMatch(sourceMessage, targetMessage, matchingConfiguration.getId(), matchedAttributes, unmatchedAttributes);
-
-                MatchingResult matchingResult = new MatchingResult();
-                matchingResult.setMatchingConfigurationId(matchingConfiguration.getId());
-                matchingResult.setSourceMessages(Map.of(sourceMessage.getId(),"sourceMessageId" + sourceMessage.getId()));
-                matchingResult.setTargetMessages(Map.of(targetMessage.getId(), "Target Message " + targetMessage.getId()));
-                matchingResult.setTimestamp(new Date());
-                matchingResult.setMatchedAttributes(new HashMap<>(matchedAttributes));
-                matchingResult.setUnmatchedAttributes(new HashMap<>(unmatchedAttributes));
-                matchingResult.setMatchStatus(matchedAttributes.isEmpty() ? "Unmatched" : "Matched");
-
-                StringBuilder matchDetails = new StringBuilder();
-                if (match) {
-                    matchDetails.append("Source message ID: ").append(sourceMessage.getId())
-                            .append(", Target message ID: ").append(targetMessage.getId())
-                            .append(" did match.\n");
-                    sourceMessageMatchStatus.put(sourceMessage.getId(), true);
-                    targetMessageMatchStatus.put(targetMessage.getId(), true);
-                } else {
-                    matchDetails.append("Source message ID: ").append(sourceMessage.getId())
-                            .append(", Target message ID: ").append(targetMessage.getId())
-                            .append(" did not match.\n");
-                }
-                matchingResult.setMatchDetails(matchDetails.toString());
-
-                System.out.println("Overall matched attributes for source message ID " + sourceMessage.getId() + ": " + matchedAttributes);
-                System.out.println("Overall unmatched attributes for source message ID " + sourceMessage.getId() + ": " + unmatchedAttributes);
-
-                matchingResultsRepository.save(matchingResult);
-                updateMessageStatuses(sourceMessageMatchStatus);
-                updateMessageStatuses(targetMessageMatchStatus);
-            }
-        }
-    }
+  }
 
 
     private void updateMessageStatuses(Map<String, Boolean> messageMatchStatus) {

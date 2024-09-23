@@ -3,6 +3,7 @@ package com.emna.micro_service4.mapper;
 import com.emna.micro_service4.dto.ReconciliationConfigurationDTO;
 import com.emna.micro_service4.model.ReconciliationConfiguration;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,6 +15,7 @@ public class ReconciliationConfigurationMapper {
         entity.setName(dto.getName());
         entity.setMatchingConfigurationId(dto.getMatchingConfigurationId());
         entity.setCreationDate(dto.getCreationDate());
+        entity.setCreationDate(new Date());
         entity.setUpdateDate(dto.getUpdateDate());
         entity.setTolerance(dto.getTolerance());
         entity.setScheduleList(dto.getScheduleList());

@@ -1,5 +1,6 @@
 package com.emna.micro_service4.service;
 
+import com.emna.micro_service3.model.IndexConfigurationAttributeToAdd;
 import com.emna.micro_service4.Repository.AttributesToReconciliationRepository;
 import com.emna.micro_service4.dto.AttributesToReconciliationDTO;
 import com.emna.micro_service4.dto.FormulaDTO;
@@ -8,10 +9,9 @@ import com.emna.micro_service4.model.AttributesToReconciliation;
 import com.emna.micro_service4.model.enums.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,7 +21,7 @@ public class AttributesToReconciliationService {
     private AttributesToReconciliationRepository repository;
 
 
-    public AttributesToReconciliation createOrUpdateAttributesToReconciliation(AttributesToReconciliationDTO dto) {
+  /*  public AttributesToReconciliation createOrUpdateAttributesToReconciliation(AttributesToReconciliationDTO dto) {
         // Convert string operations to enum
         dto.getSourceOperations().replaceAll((k, v) -> String.valueOf(Operation.fromString(v)));
         dto.getTargetOperations().replaceAll((k, v) -> String.valueOf(Operation.fromString(v)));
@@ -41,6 +41,48 @@ public class AttributesToReconciliationService {
 
         AttributesToReconciliation entity = AttributesToReconciliationMapper.mapToEntity(dto);
         return repository.save(entity);
+    }*/
+
+    @Transactional
+    public AttributesToReconciliation createAttributesToReconciliation(String reconciliationConfigurationId,
+                                                                       Map<Integer, IndexConfigurationAttributeToAdd> sourceAttributes,
+                                                                       Map<Integer, IndexConfigurationAttributeToAdd> targetAttributes,
+                                                                       Map<Integer, String> sourceOperations,
+                                                                       Map<Integer, String> targetOperations,
+                                                                       Map<Integer, String> sourceValues,
+                                                                       Map<Integer, String> targetValues) {
+
+        System.out.println("Received reconciliationConfigurationId: " + reconciliationConfigurationId);
+        System.out.println("Received sourceAttributes: " + sourceAttributes);
+        System.out.println("Received targetAttributes: " + targetAttributes);
+        System.out.println("Received sourceOperations: " + sourceOperations);
+        System.out.println("Received targetOperations: " + targetOperations);
+        System.out.println("Received sourceValues: " + sourceValues);
+        System.out.println("Received targetValues: " + targetValues);
+
+        Map<Integer, Operation> sourceOperationsMap = new HashMap<>();
+        Map<Integer, Operation> targetOperationsMap = new HashMap<>();
+
+        // Convert String operations to Operation enum
+        for (Map.Entry<Integer, String> entry : sourceOperations.entrySet()) {
+            sourceOperationsMap.put(entry.getKey(), Operation.fromString(entry.getValue()));
+        }
+        for (Map.Entry<Integer, String> entry : targetOperations.entrySet()) {
+            targetOperationsMap.put(entry.getKey(), Operation.fromString(entry.getValue()));
+        }
+
+        AttributesToReconciliation attributesToReconciliation = new AttributesToReconciliation(
+                UUID.randomUUID().toString(),
+                reconciliationConfigurationId,
+                sourceAttributes,
+                targetAttributes,
+                sourceOperationsMap,
+                targetOperationsMap,
+                sourceValues,
+                targetValues
+        );
+
+        return repository.save(attributesToReconciliation);
     }
 
     private boolean entityAlreadyExists(AttributesToReconciliationDTO dto) {

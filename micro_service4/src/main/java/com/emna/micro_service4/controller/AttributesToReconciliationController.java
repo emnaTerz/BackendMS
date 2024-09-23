@@ -6,7 +6,6 @@ import com.emna.micro_service4.dto.FormulaDTO;
 import com.emna.micro_service4.model.AttributesToReconciliation;
 import com.emna.micro_service4.service.AttributesToReconciliationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +20,7 @@ public class AttributesToReconciliationController {
     @Autowired
     private AttributesToReconciliationService service;
 
-    @PostMapping("/attributes/create")
+   /* @PostMapping("/attributes/create")
     public ResponseEntity<?> createOrUpdateAttributes(@RequestBody AttributesToReconciliationDTO dto) {
         try {
             AttributesToReconciliation entity = service.createOrUpdateAttributesToReconciliation(dto);
@@ -31,7 +30,24 @@ public class AttributesToReconciliationController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid data");
         }
+    }*/
+
+
+    @PostMapping("/attributes/create")
+    public ResponseEntity<AttributesToReconciliation> createAttributesToReconciliation(@RequestBody AttributesToReconciliationDTO request) {
+        AttributesToReconciliation created = service.createAttributesToReconciliation(
+                request.getReconciliationConfigurationId(),
+                request.getSourceAttributes(),
+                request.getTargetAttributes(),
+                request.getSourceOperations(),
+                request.getTargetOperations(),
+                request.getSourceValues(),
+                request.getTargetValues()
+        );
+        return ResponseEntity.ok(created);
     }
+
+
 
     @GetMapping("/attributes/{id}")
     public ResponseEntity<AttributesToReconciliationDTO> getAttributesToReconciliation(@PathVariable String id) {

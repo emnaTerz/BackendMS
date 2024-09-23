@@ -89,4 +89,14 @@ public class MessageController {
         service.updateStatusById(id, request.getStatus());
         return ResponseEntity.ok().build();
     }
+    @GetMapping("/messages")
+    public ResponseEntity<List<PendingMessage>> findAllPendingMessages() {
+        List<PendingMessage> messages = service.getAllMessages();
+        if (messages.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.ok(messages);
+        }
+    }
+
 }

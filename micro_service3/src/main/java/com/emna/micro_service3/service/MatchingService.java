@@ -241,4 +241,21 @@ public class MatchingService {
     public List<MatchingResult> getMatchingResultsByConfigurationIdAndStatus(String matchingConfigurationId, String matchStatus) {
         return matchingResultsRepository.findByMatchingConfigurationIdAndMatchStatus(matchingConfigurationId, matchStatus);
     }
+
+    public List<MatchingResult> findMatchingResultsByMessageId(String messageId) {
+        List<MatchingResult> allResults = matchingResultsRepository.findAll();
+
+        // Log the size of all results and the incoming messageId
+        System.out.println("Total Matching Results Fetched: " + allResults.size());
+        System.out.println("Filtering results by messageId: " + messageId);
+
+        return allResults.stream()
+                .filter(result ->
+                        (result.getSourceMessages() != null && result.getSourceMessages().containsKey(messageId)) ||
+                                (result.getTargetMessages() != null && result.getTargetMessages().containsKey(messageId))
+                )
+                .collect(Collectors.toList());
+    }
+
+
 }

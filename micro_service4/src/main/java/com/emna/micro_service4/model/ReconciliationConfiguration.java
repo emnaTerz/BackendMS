@@ -19,6 +19,7 @@ public class ReconciliationConfiguration {
     private String tolerance;
     private List<Date> scheduleList;
 
+    private Date lastReconciliationDate;
     // No-argument constructor
     public ReconciliationConfiguration() {
         this.id = UUID.randomUUID().toString();  // Automatically generate key when an instance is created
@@ -90,5 +91,14 @@ public class ReconciliationConfiguration {
 
     public void setScheduleList(List<Date> scheduleList) {
         this.scheduleList = scheduleList;
+    }
+
+
+    public Date getLastReconciliationDate() {
+        return lastReconciliationDate;
+    }
+
+    public void setLastReconciliationDate(Date lastReconciliationDate) {
+        this.lastReconciliationDate = lastReconciliationDate;
     }
 }

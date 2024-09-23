@@ -6,19 +6,26 @@ import com.emna.micro_service1.dao.response.JwtAuthenticationResponse;
 import com.emna.micro_service1.entities.User;
 import com.emna.micro_service1.service.AuthenticationService;
 import com.emna.micro_service1.service.UserService;
+import com.emna.micro_service1.service.impl.JwtServiceImpl;
+import com.emna.micro_service1.service.impl.TokenBlacklistService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-/*@CrossOrigin(origins = "http://localhost:4200")*/
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
     private final UserService userService;
+    @Autowired
+    private TokenBlacklistService tokenBlacklistService;
+    @Autowired
+    private JwtServiceImpl jwtService;
     @PostMapping("/signup")
     public ResponseEntity<JwtAuthenticationResponse> signup(@RequestBody SignUpRequest request) {
         return ResponseEntity.ok(authenticationService.signup(request));
@@ -63,4 +70,14 @@ public class AuthenticationController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        String token = jwtService.getTokenFromRequest(request);
+        if (token != null && !token.isEmpty()) {
+            tokenBlacklistService.addTokenToBlacklist(token);
+        }
+        return ResponseEntity.ok("Logged out successfully");
+    }
+
+
 }
