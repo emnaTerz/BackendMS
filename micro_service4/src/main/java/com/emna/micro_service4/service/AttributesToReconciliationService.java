@@ -21,27 +21,6 @@ public class AttributesToReconciliationService {
     private AttributesToReconciliationRepository repository;
 
 
-  /*  public AttributesToReconciliation createOrUpdateAttributesToReconciliation(AttributesToReconciliationDTO dto) {
-        // Convert string operations to enum
-        dto.getSourceOperations().replaceAll((k, v) -> String.valueOf(Operation.fromString(v)));
-        dto.getTargetOperations().replaceAll((k, v) -> String.valueOf(Operation.fromString(v)));
-
-        // Validate operations
-        if (dto.getSourceOperations().containsValue(null) || dto.getTargetOperations().containsValue(null)) {
-            throw new IllegalArgumentException("Invalid operation detected");
-        }        // Generate UUID if not provided
-        if (dto.getId() == null || dto.getId().isEmpty()) {
-            dto.setId(UUID.randomUUID().toString());
-        }
-
-        // Check for an existing entity that matches all attributes
-        if (entityAlreadyExists(dto)) {
-            throw new IllegalStateException("An identical entity already exists.");
-        }
-
-        AttributesToReconciliation entity = AttributesToReconciliationMapper.mapToEntity(dto);
-        return repository.save(entity);
-    }*/
 
     @Transactional
     public AttributesToReconciliation createAttributesToReconciliation(String reconciliationConfigurationId,

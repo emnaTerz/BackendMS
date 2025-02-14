@@ -1,105 +1,12 @@
-/*package com.emna.micro_service4.service;
 
-import com.emna.micro_service4.Repository.ReconciliationConfigurationRepository;
-import com.emna.micro_service4.Repository.ReconciliationResultsRepository;
-import com.emna.micro_service4.dto.ReconciliationConfigurationDTO;
-import com.emna.micro_service4.mapper.ReconciliationConfigurationMapper;
-import com.emna.micro_service4.model.ReconciliationConfiguration;
-import com.emna.micro_service4.model.ReconciliationResult;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-@Service
-public class ReconciliationConfigurationService {
-    @Autowired
-    private ReconciliationResultsRepository reconciliationResultsRepository;
-    @Autowired
-    private ReconciliationConfigurationRepository repository;
-
-    public ReconciliationConfiguration createReconciliationConfiguration(ReconciliationConfigurationDTO dto) {
-        // Check if a configuration with the same matchingConfigurationId already exists
-        Optional<ReconciliationConfiguration> existingConfig = repository.findByMatchingConfigurationId(dto.getMatchingConfigurationId());
-        if (existingConfig.isPresent()) {
-            // Handle the case where configuration exists, e.g., throw an exception or return null
-            throw new IllegalStateException("Configuration with matchingConfigurationId '" + dto.getMatchingConfigurationId() + "' already exists.");
-        }
-
-        ReconciliationConfiguration config = ReconciliationConfigurationMapper.mapToEntity(dto);
-        return repository.save(config);
-    }
-
-    public Optional<ReconciliationConfigurationDTO> getReconciliationConfiguration(String id) {
-        return repository.findById(id).map(ReconciliationConfigurationMapper::mapToDTO);
-    }
-
-    public ReconciliationConfiguration updateReconciliationConfiguration(String id, ReconciliationConfigurationDTO dto) {
-        return repository.findById(id)
-                .map(existingConfig -> {
-                    ReconciliationConfiguration updatedConfig = ReconciliationConfigurationMapper.mapToEntity(dto);
-                    updatedConfig.setId(existingConfig.getId()); // Preserve the existing ID
-                    return repository.save(updatedConfig);
-                }).orElse(null);
-    }
-
-    public boolean deleteReconciliationConfiguration(String id) {
-        if (repository.existsById(id)) {
-            repository.deleteById(id);
-            return true; // Return true indicating the deletion was successful
-        }
-        return false; // Return false if the configuration was not found
-    }
-
-    public List<ReconciliationConfigurationDTO> getAllReconciliationConfigurations() {
-        Iterable<ReconciliationConfiguration> configurations = repository.findAll();
-        return StreamSupport.stream(configurations.spliterator(), false)
-                .map(ReconciliationConfigurationMapper::mapToDTO)
-                .collect(Collectors.toList());
-    }
-
-
-    public boolean doesPairExist(String reconciliationConfigurationId, String sourceMessageId, String targetMessageId) {
-        // Retrieve all results for the given reconciliationConfigurationId
-        List<ReconciliationResult> results = reconciliationResultsRepository.findByReconciliationConfigurationId(reconciliationConfigurationId);
-
-        // Check if any result contains the specified sourceMessageId and targetMessageId
-        for (ReconciliationResult result : results) {
-            String sourceId = result.getSourceMessages().get("sourceMessageId");
-            String targetId = result.getTargetMessages().values().stream().findFirst().orElse(null);
-            if (sourceMessageId.equals(sourceId) && targetMessageId.equals(targetId)) {
-                return true; // Pair exists
-            }
-        }
-        return false; // Pair does not exist
-    }
-
-    public boolean doesGroupExist(String reconciliationConfigurationId, String sourceMessageId, Set<String> targetMessageIds) {
-        List<ReconciliationResult> results = reconciliationResultsRepository.findByReconciliationConfigurationId(reconciliationConfigurationId);
-
-        for (ReconciliationResult result : results) {
-            String sourceId = result.getSourceMessages().get("sourceMessageId");
-            Set<String> existingTargetIds = new HashSet<>(result.getTargetMessages().values());
-
-            if (sourceMessageId.equals(sourceId) && targetMessageIds.equals(existingTargetIds)) {
-                return true; // Group already reconciled
-            }
-        }
-        return false; // Group not reconciled
-    }
-
-}*/
 package com.emna.micro_service4.service;
 
+import com.emna.micro_service4.Repository.AttributesToReconciliationRepository;
 import com.emna.micro_service4.Repository.ReconciliationConfigurationRepository;
 import com.emna.micro_service4.Repository.ReconciliationResultsRepository;
 import com.emna.micro_service4.dto.ReconciliationConfigurationDTO;
 import com.emna.micro_service4.mapper.ReconciliationConfigurationMapper;
+import com.emna.micro_service4.model.AttributesToReconciliation;
 import com.emna.micro_service4.model.ReconciliationConfiguration;
 import com.emna.micro_service4.model.ReconciliationResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,6 +21,8 @@ import java.util.stream.StreamSupport;
 public class ReconciliationConfigurationService {
     @Autowired
     private ReconciliationResultsRepository reconciliationResultsRepository;
+    @Autowired
+    private AttributesToReconciliationRepository attributesRepository;
     @Autowired
     private ReconciliationConfigurationRepository repository;
 
@@ -144,13 +53,37 @@ public class ReconciliationConfigurationService {
                 }).orElse(null);
     }
 
-    public boolean deleteReconciliationConfiguration(String id) {
+  /*  public boolean deleteReconciliationConfiguration(String id) {
         if (repository.existsById(id)) {
             repository.deleteById(id);
             return true; // Return true indicating the deletion was successful
         }
         return false; // Return false if the configuration was not found
+    }*/
+
+
+
+    public boolean deleteReconciliationConfiguration(String id) {
+        if (repository.existsById(id)) {
+            // Delete associated AttributesToReconciliation
+            List<AttributesToReconciliation> associatedAttributes = attributesRepository.findByReconciliationConfigurationId(id);
+            if (!associatedAttributes.isEmpty()) {
+                attributesRepository.deleteAll(associatedAttributes);
+            }
+
+            // Delete associated ReconciliationResults
+            List<ReconciliationResult> associatedResults = reconciliationResultsRepository.findByReconciliationConfigurationId(id);
+            if (!associatedResults.isEmpty()) {
+                reconciliationResultsRepository.deleteAll(associatedResults);
+            }
+
+            // Delete the ReconciliationConfiguration itself
+            repository.deleteById(id);
+            return true; // Return true indicating the deletion was successful
+        }
+        return false; // Return false if the configuration was not found
     }
+
 
     public List<ReconciliationConfigurationDTO> getAllReconciliationConfigurations() {
         Iterable<ReconciliationConfiguration> configurations = repository.findAll();

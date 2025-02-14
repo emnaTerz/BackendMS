@@ -50,10 +50,6 @@ public class IndexConfigurationService {
     private String storageLocation;
     @Value("${json.storage.directory}")
     private String storageDirectory;
-    public boolean configurationExists(String name, String sender, String messageCategory) {
-        Optional<IndexConfiguration> config = indexConfigurationRepository.findByNameAndSenderAndMessageCategory(name, sender, messageCategory);
-        return config.isPresent();
-    }
 
     @Autowired
     public IndexConfigurationService(IndexConfigurationRepository indexConfigurationRepository) {
@@ -304,7 +300,7 @@ public class IndexConfigurationService {
 
     @Transactional
     public boolean deleteConfiguration(String configurationId) {
-        // First, fetch the IndexConfiguration entity using the provided configuration ID
+        // Fetch the IndexConfiguration entity using the provided configuration ID
         Optional<IndexConfiguration> configurationOptional = indexConfigurationRepository.findById(configurationId);
 
         if (!configurationOptional.isPresent()) {
@@ -321,9 +317,28 @@ public class IndexConfigurationService {
             System.out.println("Deleted attributes for configuration ID: " + configurationId);
         }
 
+        // Fetch all pending messages associated with the configuration
+        List<PendingMessage> pendingMessages = pendingMessageRepository.findByIndexConfigurationId(configurationId);
+
+        if (!pendingMessages.isEmpty()) {
+            // Fetch and delete all ValueOfAttribute associated with the pending messages
+            List<String> pendingMessageIds = pendingMessages.stream().map(PendingMessage::getId).collect(Collectors.toList());
+            List<ValueOfAttribute> valueOfAttributes = valueOfAttributeRepository.findByPendingMessageIdIn(pendingMessageIds);
+
+            if (!valueOfAttributes.isEmpty()) {
+                valueOfAttributeRepository.deleteAll(valueOfAttributes);
+                System.out.println("Deleted value attributes for pending messages associated with configuration ID: " + configurationId);
+            }
+
+            // Delete all pending messages
+            pendingMessageRepository.deleteAll(pendingMessages);
+            System.out.println("Deleted pending messages for configuration ID: " + configurationId);
+        }
+
         // Now, delete the IndexConfiguration itself
         indexConfigurationRepository.delete(configurationOptional.get());
         System.out.println("Deleted configuration with ID: " + configurationId);
+
         return true;
     }
 

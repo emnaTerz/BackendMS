@@ -12,5 +12,7 @@ public interface ValueOfAttributeRepository extends ElasticsearchRepository<Valu
     List<ValueOfAttribute> findByPendingMessageId(String id);
 
     void deleteByAttributeKey(String attributeKey);
+    List<ValueOfAttribute> findByPendingMessageIdIn(List<String> pendingMessageIds);
+
 
 }
